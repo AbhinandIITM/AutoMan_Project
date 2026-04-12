@@ -10,13 +10,14 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        ('share/' + package_name + '/data', ['data/dataset.json']),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='abhinand',
     maintainer_email='153114742+AbhinandIITM@users.noreply.github.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Perception and task-routing nodes for the AutoMan simulation',
+    license='MIT',
     extras_require={
         'test': [
             'pytest',
@@ -24,7 +25,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'vision_pipeline = automan_perception.vision_pipeline:main',
+            'vision_pipeline = perception.vision_pipeline:main',
         ],
     },
 )
