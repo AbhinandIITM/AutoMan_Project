@@ -21,7 +21,13 @@ setup(
         ('share/' + package_name + '/urdf', glob('urdf/*.urdf')),
         ('share/' + package_name + '/urdf', glob('urdf/*.xacro')),
 
-        # Meshes (IMPORTANT)
+        # ✅ CONFIG (CRITICAL for ros2_control)
+        ('share/' + package_name + '/config', glob('config/*.yaml')),
+
+        # ✅ RVIZ
+        ('share/' + package_name + '/rviz', glob('rviz/*.rviz')),
+
+        # Meshes
         ('share/' + package_name + '/urdf/meshes/visual',
             glob('urdf/meshes/visual/*')),
 
