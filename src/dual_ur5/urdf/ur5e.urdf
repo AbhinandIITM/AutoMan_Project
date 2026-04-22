@@ -1,5 +1,11 @@
 <?xml version="1.0" ?>
 <robot name="ur5e_robot">
+  <link name="world"/>
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
   <link name="base_link">
     <visual>
       <origin rpy="0 0 3.141592653589793" xyz="0 0 0"/>
@@ -10,22 +16,17 @@
         <color rgba="0.7 0.7 0.7 1.0"/>
       </material>
     </visual>
-
     <collision>
       <origin rpy="0 0 3.141592653589793" xyz="0 0 0"/>
       <geometry>
         <mesh filename="package://dual_ur5/urdf/meshes/collision/base.stl"/>
       </geometry>
     </collision>
-
     <inertial>
       <mass value="4.0"/>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0"
-              iyy="0.00443333156" iyz="0.0"
-              izz="0.0072"/>
+      <inertia ixx="0.00443333156" ixy="0.0" ixz="0.0" iyy="0.00443333156" iyz="0.0" izz="0.0072"/>
     </inertial>
-
   </link>
   <link name="shoulder_link">
     <visual>
@@ -95,7 +96,6 @@
   </link>
   <link name="wrist_1_link">
     <visual>
-      <!-- TODO: Move this to a parameter -->
       <origin rpy="1.5707963267948966 0 0" xyz="0 0 -0.127"/>
       <geometry>
         <mesh filename="package://dual_ur5/urdf/meshes/visual/wrist1.dae"/>
@@ -160,7 +160,6 @@
       <inertia ixx="9.890410052167731e-05" ixy="0.0" ixz="0.0" iyy="9.890410052167731e-05" iyz="0.0" izz="0.0001321171875"/>
     </inertial>
   </link>
-  <!-- joints: main serial chain -->
   <joint name="shoulder_pan_joint" type="revolute">
     <parent link="base_link"/>
     <child link="shoulder_link"/>
@@ -209,114 +208,64 @@
     <limit effort="28.0" lower="-6.283185307179586" upper="6.283185307179586" velocity="3.141592653589793"/>
     <dynamics damping="0" friction="0"/>
   </joint>
-  <!-- ROS-Industrial 'base' frame: base_link to UR 'Base' Coordinates transform -->
   <link name="base"/>
   <joint name="base_link-base_fixed_joint" type="fixed">
-    <!-- Note the rotation over Z of pi radians: as base_link is REP-103
-           aligned (ie: has X+ forward, Y+ left and Z+ up), this is needed
-           to correctly align 'base' with the 'Base' coordinate system of
-           the UR controller.
-      -->
     <origin rpy="0 0 3.141592653589793" xyz="0 0 0"/>
     <parent link="base_link"/>
     <child link="base"/>
   </joint>
-  <!-- ROS-Industrial 'flange' frame: attachment point for EEF models -->
   <link name="flange"/>
   <joint name="wrist_3-flange" type="fixed">
     <parent link="wrist_3_link"/>
     <child link="flange"/>
     <origin rpy="0 -1.5707963267948966 -1.5707963267948966" xyz="0 0 0"/>
   </joint>
-  <!-- ROS-Industrial 'tool0' frame: all-zeros tool frame -->
   <link name="tool0"/>
   <joint name="flange-tool0" type="fixed">
-    <!-- default toolframe: X+ left, Y+ up, Z+ front -->
     <origin rpy="1.5707963267948966 0 1.5707963267948966" xyz="0 0 0"/>
     <parent link="flange"/>
     <child link="tool0"/>
   </joint>
-
   <ros2_control name="GazeboSystem" type="system">
     <hardware>
       <plugin>gazebo_ros2_control/GazeboSystem</plugin>
     </hardware>
-
-    <!-- Shoulder Pan -->
     <joint name="shoulder_pan_joint">
-      <command_interface name="position">
-        <param name="min">-6.283</param>
-        <param name="max">6.283</param>
-      </command_interface>
+      <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
-      <state_interface name="effort"/>
     </joint>
-
-    <!-- Shoulder Lift -->
     <joint name="shoulder_lift_joint">
-      <command_interface name="position">
-        <param name="min">-6.283</param>
-        <param name="max">6.283</param>
-      </command_interface>
+      <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
-      <state_interface name="effort"/>
     </joint>
-
-    <!-- Elbow -->
     <joint name="elbow_joint">
-      <command_interface name="position">
-        <param name="min">-6.283</param>
-        <param name="max">6.283</param>
-      </command_interface>
+      <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
-      <state_interface name="effort"/>
     </joint>
-
-    <!-- Wrist 1 -->
     <joint name="wrist_1_joint">
-      <command_interface name="position">
-        <param name="min">-6.283</param>
-        <param name="max">6.283</param>
-      </command_interface>
+      <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
-      <state_interface name="effort"/>
     </joint>
-
-    <!-- Wrist 2 -->
     <joint name="wrist_2_joint">
-      <command_interface name="position">
-        <param name="min">-6.283</param>
-        <param name="max">6.283</param>
-      </command_interface>
+      <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
-      <state_interface name="effort"/>
     </joint>
-
-    <!-- Wrist 3 -->
     <joint name="wrist_3_joint">
-      <command_interface name="position">
-        <param name="min">-6.283</param>
-        <param name="max">6.283</param>
-      </command_interface>
+      <command_interface name="position"/>
       <state_interface name="position"/>
       <state_interface name="velocity"/>
-      <state_interface name="effort"/>
     </joint>
-
   </ros2_control>
-
   <gazebo>
     <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
       <parameters>/home/abhinand/AutoMan_ws/src/dual_ur5/config/ur5e_config.yaml</parameters>
       <robot_param>robot_description</robot_param>
       <robot_param_node>robot_state_publisher</robot_param_node>
-    </plugin>
+   </plugin>
   </gazebo>
-
 </robot>
-

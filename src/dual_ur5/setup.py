@@ -47,7 +47,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'simple_task_executor = dual_ur5.simple_task_executor:main',
+            'gui_bridge = dual_ur5.gui_bridge:main',
         ],
     },
 )
