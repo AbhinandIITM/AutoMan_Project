@@ -8,20 +8,19 @@ class GuiToGazeboBridge(Node):
     def __init__(self):
         super().__init__('gui_to_gazebo_bridge')
         
-        # Listen to the GUI
+        # FIX: Removed leading slashes so topics are relative to the namespace
         self.subscription = self.create_subscription(
             JointState,
-            '/joint_states_publisher',
+            'joint_states_publisher', 
             self.listener_callback,
             10)
             
-        # Publish to Gazebo's trajectory controller
+        # FIX: Removed leading slash
         self.publisher = self.create_publisher(
             JointTrajectory,
-            '/joint_trajectory_controller/joint_trajectory',
+            'joint_trajectory_controller/joint_trajectory', 
             10)
             
-        # The joints we want to control
         self.joint_names = [
             'shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
             'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'

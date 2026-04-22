@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
-<robot name="ur5e_robot">
+<robot name="$(arg robot_name)" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="robot_name" default="GazeboSystem"/>
   <link name="world"/>
   <joint name="world_joint" type="fixed">
     <parent link="world"/>
@@ -226,7 +227,7 @@
     <parent link="flange"/>
     <child link="tool0"/>
   </joint>
-  <ros2_control name="GazeboSystem" type="system">
+  <ros2_control name="$(arg robot_name)" type="system">
     <hardware>
       <plugin>gazebo_ros2_control/GazeboSystem</plugin>
     </hardware>
@@ -262,10 +263,13 @@
     </joint>
   </ros2_control>
   <gazebo>
-    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control_$(arg robot_name)">
+      <ros>
+        <namespace>/$(arg robot_name)</namespace>
+      </ros>
       <parameters>/home/abhinand/AutoMan_ws/src/dual_ur5/config/ur5e_config.yaml</parameters>
       <robot_param>robot_description</robot_param>
-      <robot_param_node>robot_state_publisher</robot_param_node>
+      <robot_param_node>/$(arg robot_name)/robot_state_publisher</robot_param_node>
    </plugin>
   </gazebo>
 </robot>
