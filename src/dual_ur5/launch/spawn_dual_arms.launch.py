@@ -30,6 +30,20 @@ def generate_launch_description():
     )
 
     # ==========================================================
+    # DEFAULT JOINT CONFIGURATION
+    # ==========================================================
+    default_joint_positions_list = [0.0, 5.417, 1.341, -0.441, 0.102, 1.732]
+    
+    default_joint_positions_dict = {
+        'shoulder_pan_joint': 0.00,
+        'shoulder_lift_joint': 5.417,
+        'elbow_joint': 1.341,
+        'wrist_1_joint': -0.441,
+        'wrist_2_joint': 0.102,
+        'wrist_3_joint': 1.732
+    }
+
+    # ==========================================================
     # ARM 1 DEFINITIONS
     # ==========================================================
     robot_description_content_1 = ParameterValue(
@@ -43,7 +57,7 @@ def generate_launch_description():
     spawn_1 = Node(
         package='gazebo_ros', executable='spawn_entity.py',
         namespace='arm_1', output='screen',
-        arguments=['-entity', 'arm_1', '-topic', 'robot_description', '-robot_namespace', 'arm_1', '-x', '0.0', '-y', '0.0', '-z', '0.0']
+        arguments=['-entity', 'arm_1', '-topic', 'robot_description', '-robot_namespace', 'arm_1', '-x', '0.0', '-y', '0.0', '-z', '1.02']
     )
     jsb_1 = Node(
         package="controller_manager", executable="spawner",
@@ -56,12 +70,28 @@ def generate_launch_description():
     gui_1 = Node(
         package='joint_state_publisher_gui', executable='joint_state_publisher_gui',
         namespace='arm_1', output='screen',
-        parameters=[{'use_sim_time': True, 'robot_description': robot_description_content_1}],
+        parameters=[{
+            'use_sim_time': True, 
+            'robot_description': robot_description_content_1,
+            'zeros': default_joint_positions_dict
+        }],
         remappings=[('joint_states', 'joint_states_publisher')]
     )
     bridge_1 = Node(
         package='dual_ur5', executable='gui_bridge',
-        namespace='arm_1', output='screen', parameters=[{'use_sim_time': True}]
+        namespace='arm_1', output='screen', 
+        parameters=[{
+            'use_sim_time': True,
+            'initial_joint_positions': default_joint_positions_list
+        }]
+    )
+    set_init_angle_1 = Node(
+        package='dual_ur5', executable='set_joint_angles',
+        namespace='arm_1', output='screen',
+        parameters=[{
+            "use_sim_time": True,
+            "joint_positions": default_joint_positions_list
+        }]
     )
 
     # ==========================================================
@@ -78,7 +108,7 @@ def generate_launch_description():
     spawn_2 = Node(
         package='gazebo_ros', executable='spawn_entity.py',
         namespace='arm_2', output='screen',
-        arguments=['-entity', 'arm_2', '-topic', 'robot_description', '-robot_namespace', 'arm_2', '-x', '0.0', '-y', '1.0', '-z', '0.0']
+        arguments=['-entity', 'arm_2', '-topic', 'robot_description', '-robot_namespace', 'arm_2', '-x', '0.0', '-y', '0.6', '-z', '1.02']
     )
     jsb_2 = Node(
         package="controller_manager", executable="spawner",
@@ -91,25 +121,41 @@ def generate_launch_description():
     gui_2 = Node(
         package='joint_state_publisher_gui', executable='joint_state_publisher_gui',
         namespace='arm_2', output='screen',
-        parameters=[{'use_sim_time': True, 'robot_description': robot_description_content_2}],
+        parameters=[{
+            'use_sim_time': True, 
+            'robot_description': robot_description_content_2,
+            'zeros': default_joint_positions_dict
+        }],
         remappings=[('joint_states', 'joint_states_publisher')]
     )
     bridge_2 = Node(
         package='dual_ur5', executable='gui_bridge',
-        namespace='arm_2', output='screen', parameters=[{'use_sim_time': True}]
+        namespace='arm_2', output='screen', 
+        parameters=[{
+            'use_sim_time': True,
+            'initial_joint_positions': default_joint_positions_list
+        }]
+    )
+    set_init_angle_2 = Node(
+        package='dual_ur5', executable='set_joint_angles',
+        namespace='arm_2', output='screen',
+        parameters=[{
+            "use_sim_time": True,
+            "joint_positions": default_joint_positions_list
+        }]
     )
 
     # ==========================================================
-    # EVENT HANDLERS: THE SEQUENCING LOGIC (NO RACE CONDITIONS!)
+    # EVENT HANDLERS: THE SEQUENCING LOGIC
     # ==========================================================
     
     # 1. Start Arm 1 controllers AFTER Arm 1 is fully spawned
     start_controllers_1 = RegisterEventHandler(
         OnProcessExit(target_action=spawn_1, on_exit=[jsb_1, jtc_1])
     )
-    # 2. Start Arm 1 GUI AFTER Arm 1 controllers are active
-    start_gui_1 = RegisterEventHandler(
-        OnProcessExit(target_action=jtc_1, on_exit=[gui_1, bridge_1])
+    # 2. Start Arm 1 GUI, Bridge, and Init Angles AFTER Arm 1 trajectory controller is active
+    start_post_controllers_1 = RegisterEventHandler(
+        OnProcessExit(target_action=jtc_1, on_exit=[gui_1, bridge_1, set_init_angle_1])
     )
 
     # 3. CRITICAL: Do NOT even attempt to spawn Arm 2 until Arm 1 is fully spawned!
@@ -121,9 +167,9 @@ def generate_launch_description():
     start_controllers_2 = RegisterEventHandler(
         OnProcessExit(target_action=spawn_2, on_exit=[jsb_2, jtc_2])
     )
-    # 5. Start Arm 2 GUI AFTER Arm 2 controllers are active
-    start_gui_2 = RegisterEventHandler(
-        OnProcessExit(target_action=jtc_2, on_exit=[gui_2, bridge_2])
+    # 5. Start Arm 2 GUI, Bridge, and Init Angles AFTER Arm 2 trajectory controller is active
+    start_post_controllers_2 = RegisterEventHandler(
+        OnProcessExit(target_action=jtc_2, on_exit=[gui_2, bridge_2, set_init_angle_2])
     )
 
     return LaunchDescription([
@@ -131,10 +177,10 @@ def generate_launch_description():
         gazebo,
         rsp_1,             # Publish Arm 1 state
         rsp_2,             # Publish Arm 2 state
-        spawn_1,           # Begin spawning Arm 1 (kicks off the chain)
+        spawn_1,           # Begin spawning Arm 1
         start_controllers_1,
-        start_gui_1,
-        start_spawn_2,     # This waits patiently for spawn_1 to finish!
+        start_post_controllers_1,
+        start_spawn_2,     # This waits patiently for spawn_1 to finish
         start_controllers_2,
-        start_gui_2
+        start_post_controllers_2,
     ])

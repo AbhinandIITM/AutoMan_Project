@@ -33,7 +33,7 @@ setup(
 
         ('share/' + package_name + '/urdf/meshes/collision',
             glob('urdf/meshes/collision/*')),
-    ],
+    ] + [(os.path.join('share', package_name, root), [os.path.join(root, f) for f in files]) for root, _, files in os.walk('models') if files],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='abhinand',
@@ -48,6 +48,7 @@ setup(
     entry_points={
         'console_scripts': [
             'gui_bridge = dual_ur5.gui_bridge:main',
+            'set_joint_angles = dual_ur5.set_joint_angles:main',
         ],
     },
 )
