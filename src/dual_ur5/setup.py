@@ -26,7 +26,7 @@ setup(
 
         # ✅ RVIZ
         ('share/' + package_name + '/rviz', glob('rviz/*.rviz')),
-
+        ('share/' + package_name + '/worlds', glob('worlds/*.world')),
         # Meshes
         ('share/' + package_name + '/urdf/meshes/visual',
             glob('urdf/meshes/visual/*')),

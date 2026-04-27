@@ -19,11 +19,14 @@ def generate_launch_description():
     )
 
     urdf_path = os.path.join(share_dir, 'urdf', 'ur5e.urdf')
-
+    world_path = os.path.join(share_dir, 'worlds', 'empty_world.world')
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(gazebo_pkg, 'launch', 'gazebo.launch.py')
         ),
+        launch_arguments={
+            'world': world_path
+        }.items()
     )
 
     # ==========================================================
