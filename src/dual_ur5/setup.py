@@ -49,6 +49,7 @@ setup(
         'console_scripts': [
             'gui_bridge = dual_ur5.gui_bridge:main',
             'set_joint_angles = dual_ur5.set_joint_angles:main',
+            'inv_kin = dual_ur5.inv_kin:main',
         ],
     },
 )

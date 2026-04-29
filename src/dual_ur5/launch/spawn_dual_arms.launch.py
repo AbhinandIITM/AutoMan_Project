@@ -179,8 +179,8 @@ def generate_launch_description():
         rsp_2,             # Publish Arm 2 state
         spawn_1,           # Begin spawning Arm 1
         start_controllers_1,
-        start_post_controllers_1,
+        #start_post_controllers_1,
         start_spawn_2,     # This waits patiently for spawn_1 to finish
         start_controllers_2,
-        start_post_controllers_2,
+        #start_post_controllers_2,
     ])
