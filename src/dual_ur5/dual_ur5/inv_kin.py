@@ -32,103 +32,102 @@ class InverseKinematicsNode(Node):
         # Using standard DH parameters for UR5e (in meters)
         self.d = [0.1625, 0.0, 0.0, 0.1333, 0.0997, 0.0996]
         self.a = [0.0, -0.425, -0.3922, 0.0, 0.0, 0.0]
-        self.alpha = [math.pi/2, 0.0, 0.0, math.pi/2, -math.pi/2, 0.0]
-        
-        self.get_logger().info(f"Newton-Raphson Inverse Kinematics node started for namespace: {ns}")
-        self.get_logger().info(f"Listening for target poses on: /{ns}/target_pose")
+        self.alpha = [math.pi/2, 0, 0, math.pi/2, -math.pi/2, 0]
 
-    def get_transform(self, theta, a, d, alpha):
-        ct = math.cos(theta)
-        st = math.sin(theta)
-        ca = math.cos(alpha)
-        sa = math.sin(alpha)
-        
+    def dh_transform(self, a, alpha, d, theta):
+        """Computes the Denavit-Hartenberg transformation matrix."""
         return np.array([
-            [ct, -st*ca,  st*sa, a*ct],
-            [st,  ct*ca, -ct*sa, a*st],
-            [0,   sa,     ca,    d],
-            [0,   0,      0,     1]
+            [math.cos(theta), -math.sin(theta)*math.cos(alpha),  math.sin(theta)*math.sin(alpha), a*math.cos(theta)],
+            [math.sin(theta),  math.cos(theta)*math.cos(alpha), -math.cos(theta)*math.sin(alpha), a*math.sin(theta)],
+            [0,               math.sin(alpha),                   math.cos(alpha),                  d],
+            [0,               0,                                 0,                                1]
         ])
 
     def forward_kinematics(self, joints):
-        """Computes Forward Kinematics up to wrist_3_link"""
+        """Computes the forward kinematics to find the end-effector transform."""
         T = np.eye(4)
         for i in range(6):
-            T_i = self.get_transform(joints[i], self.a[i], self.d[i], self.alpha[i])
-            T = T @ T_i
+            T = np.dot(T, self.dh_transform(self.a[i], self.alpha[i], self.d[i], joints[i]))
         return T
 
-    def get_jacobian(self, joints):
-        """Computes the Numerical Jacobian for the UR5e"""
+    def jacobian(self, joints):
+        """Computes the analytical Jacobian matrix."""
         J = np.zeros((6, 6))
-        delta = 1e-5
-        T0 = self.forward_kinematics(joints)
-        pos0 = T0[:3, 3]
-        rot0 = T0[:3, :3]
-        
+        T = np.eye(4)
+        z_axes = [np.array([0, 0, 1])]
+        positions = [np.array([0, 0, 0])]
+
         for i in range(6):
-            joints_delta = joints.copy()
-            joints_delta[i] += delta
-            T_delta = self.forward_kinematics(joints_delta)
+            T = np.dot(T, self.dh_transform(self.a[i], self.alpha[i], self.d[i], joints[i]))
+            z_axes.append(T[:3, 2])
+            positions.append(T[:3, 3])
+
+        end_effector_pos = positions[-1]
+
+        for i in range(6):
+            z_i = z_axes[i]
+            p_i = positions[i]
             
-            # Position derivative
-            pos_delta = T_delta[:3, 3]
-            J[:3, i] = (pos_delta - pos0) / delta
-            
-            # Orientation derivative (angular velocity)
-            rot_delta = T_delta[:3, :3]
-            R_diff = rot_delta @ rot0.T
-            
-            rx = R_diff[2, 1] - R_diff[1, 2]
-            ry = R_diff[0, 2] - R_diff[2, 0]
-            rz = R_diff[1, 0] - R_diff[0, 1]
-            J[3:, i] = np.array([rx, ry, rz]) / (2 * delta)
-            
+            # Linear velocity part
+            J[:3, i] = np.cross(z_i, end_effector_pos - p_i)
+            # Angular velocity part
+            J[3:, i] = z_i
+
         return J
 
-    def inverse_kinematics(self, target_T, initial_guess):
-        """Newton-Raphson Method with Damped Least Squares for numerical stability"""
+    def inverse_kinematics(self, target_T, initial_guess, max_iterations=500, tolerance=1e-4):
+        """Solves IK using the Newton-Raphson method with Jacobian pseudo-inverse."""
         joints = np.array(initial_guess, dtype=float)
-        max_iter = 100
-        tolerance = 1e-4
-        
-        for _ in range(max_iter):
+        target_pos = target_T[:3, 3]
+        target_rot = target_T[:3, :3]
+
+        for _ in range(max_iterations):
             current_T = self.forward_kinematics(joints)
-            
+            current_pos = current_T[:3, 3]
+            current_rot = current_T[:3, :3]
+
             # Position error
-            pos_err = target_T[:3, 3] - current_T[:3, 3]
+            err_pos = target_pos - current_pos
+
+            # Orientation error (axis-angle representation)
+            rot_diff = np.dot(target_rot, current_rot.T)
+            angle = np.arccos(np.clip((np.trace(rot_diff) - 1) / 2, -1.0, 1.0))
             
-            # Orientation error
-            R_err = target_T[:3, :3] @ current_T[:3, :3].T
-            rx = R_err[2, 1] - R_err[1, 2]
-            ry = R_err[0, 2] - R_err[2, 0]
-            rz = R_err[1, 0] - R_err[0, 1]
-            ori_err = np.array([rx, ry, rz]) / 2.0
-            
-            error = np.concatenate((pos_err, ori_err))
-            
+            if angle < 1e-6:
+                err_rot = np.zeros(3)
+            else:
+                axis = np.array([
+                    rot_diff[2, 1] - rot_diff[1, 2],
+                    rot_diff[0, 2] - rot_diff[2, 0],
+                    rot_diff[1, 0] - rot_diff[0, 1]
+                ]) / (2 * math.sin(angle))
+                err_rot = angle * axis
+
+            # Combine errors
+            error = np.concatenate((err_pos, err_rot))
+
+            # Check convergence
             if np.linalg.norm(error) < tolerance:
                 return joints
-                
-            J = self.get_jacobian(joints)
-            
-            # Damped least squares to handle singularities gracefully
-            lambda_sq = 0.01
-            J_pinv = J.T @ np.linalg.inv(J @ J.T + lambda_sq * np.eye(6))
-            
-            delta_theta = J_pinv @ error
-            joints += delta_theta
-            
-        self.get_logger().warn("IK did not converge entirely, publishing best effort.")
+
+            # Get Jacobian and apply pseudo-inverse
+            J = self.jacobian(joints)
+            J_pinv = np.linalg.pinv(J)
+
+            # Update joints (with a small learning rate to prevent wild swings)
+            delta_theta = np.dot(J_pinv, error)
+            joints += 0.5 * delta_theta 
+
+        self.get_logger().warn("IK did not converge within the maximum iterations.")
         return joints
 
     def quaternion_to_matrix(self, q):
-        """Converts Geometry_msgs Quaternion to 4x4 Rotation Matrix"""
-        x, y, z, w = q.x, q.y, q.z, q.w
+        """Converts a geometry_msgs Quaternion to a 3x3 rotation matrix."""
+        w, x, y, z = q.w, q.x, q.y, q.z
         return np.array([
-            [1 - 2*(y**2 + z**2), 2*(x*y - w*z),     2*(x*z + w*y),     0],
-            [2*(x*y + w*z),     1 - 2*(x**2 + z**2), 2*(y*z - w*x),     0],
-            [2*(x*z - w*y),     2*(y*z + w*x),     1 - 2*(x**2 + y**2), 0],
+            [1 - 2*y*y - 2*z*z, 2*x*y - 2*w*z,     2*x*z + 2*w*y,     0],
+            [2*x*y + 2*w*z,     1 - 2*x*x - 2*z*z, 2*y*z - 2*w*x,     0],
+            [2*x*z - 2*w*y,     2*y*z + 2*w*x,     1 - 2*x*x - 2*y*y, 0],
             [0,                 0,                 0,                 1]
         ])
 
@@ -146,9 +145,10 @@ class InverseKinematicsNode(Node):
         
         # Publish joint trajectory
         traj_msg = JointTrajectory()
+        ns = self.get_parameter('namespace').value
         traj_msg.joint_names = [
-            'shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 
-            'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'
+            f'{ns}_shoulder_pan_joint', f'{ns}_shoulder_lift_joint', f'{ns}_elbow_joint', 
+            f'{ns}_wrist_1_joint', f'{ns}_wrist_2_joint', f'{ns}_wrist_3_joint'
         ]
         
         point = JointTrajectoryPoint()
@@ -163,14 +163,9 @@ class InverseKinematicsNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = InverseKinematicsNode()
-    try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        pass
-    finally:
-        node.destroy_node()
-        if rclpy.ok():
-            rclpy.shutdown()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

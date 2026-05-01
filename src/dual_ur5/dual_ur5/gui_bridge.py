@@ -8,6 +8,10 @@ class GuiToGazeboBridge(Node):
     def __init__(self):
         super().__init__('gui_to_gazebo_bridge')
         
+        # Accept namespace as parameter to prepend to joint names
+        self.declare_parameter('namespace', 'arm_1')
+        ns = self.get_parameter('namespace').value
+
         # FIX: Removed leading slashes so topics are relative to the namespace
         self.subscription = self.create_subscription(
             JointState,
@@ -21,9 +25,10 @@ class GuiToGazeboBridge(Node):
             'joint_trajectory_controller/joint_trajectory', 
             10)
             
+        # Dynamically attach namespace to joint names
         self.joint_names = [
-            'shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
-            'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'
+            f'{ns}_shoulder_pan_joint', f'{ns}_shoulder_lift_joint', f'{ns}_elbow_joint',
+            f'{ns}_wrist_1_joint', f'{ns}_wrist_2_joint', f'{ns}_wrist_3_joint'
         ]
 
     def listener_callback(self, msg):

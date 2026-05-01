@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <robot name="$(arg robot_name)" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:arg name="robot_name" default="arm_1"/>
-  
+  <xacro:arg name="end_effector" default="none"/>
   <xacro:include filename="$(find dual_ur5)/urdf/ur5e_macro.xacro"/>
   <link name="world"/>
 
