@@ -1,0 +1,15 @@
+# Default initial positions for dual_ur5_scene's ros2_control fake system
+
+initial_positions:
+  arm_1_elbow_joint: 0
+  arm_1_shoulder_lift_joint: 0
+  arm_1_shoulder_pan_joint: 0
+  arm_1_wrist_1_joint: 0
+  arm_1_wrist_2_joint: 0
+  arm_1_wrist_3_joint: 0
+  arm_2_elbow_joint: 0
+  arm_2_shoulder_lift_joint: 0
+  arm_2_shoulder_pan_joint: 0
+  arm_2_wrist_1_joint: 0
+  arm_2_wrist_2_joint: 0
+  arm_2_wrist_3_joint: 0

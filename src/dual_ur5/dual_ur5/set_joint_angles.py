@@ -27,9 +27,10 @@ class PoseSetter(Node):
             return
             
         msg = JointTrajectory()
+        ns = self.get_parameter('namespace').value
         msg.joint_names = [
-            'shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 
-            'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint'
+            f'{ns}_shoulder_pan_joint', f'{ns}_shoulder_lift_joint', f'{ns}_elbow_joint', 
+            f'{ns}_wrist_1_joint', f'{ns}_wrist_2_joint', f'{ns}_wrist_3_joint'
         ]
         
         point = JointTrajectoryPoint()

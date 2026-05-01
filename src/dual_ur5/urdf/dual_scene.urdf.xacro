@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot name="dual_ur5_scene" xmlns:xacro="http://ros.org/wiki/xacro">
+  
+  <xacro:include filename="$(find dual_ur5)/urdf/ur5e_macro.xacro"/>
+
+  <link name="world"/>
+
+  <xacro:ur5e_arm prefix="arm_1_" parent="world">
+    <origin xyz="0 0 1.02" rpy="0 0 0" />
+  </xacro:ur5e_arm>
+
+  <xacro:ur5e_arm prefix="arm_2_" parent="world">
+    <origin xyz="0 0.6 1.02" rpy="0 0 0" />
+  </xacro:ur5e_arm>
+
+</robot>

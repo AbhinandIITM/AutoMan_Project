@@ -34,13 +34,22 @@ def generate_launch_description():
     # ==========================================================
     default_joint_positions_list = [0.0, 5.417, 1.341, -0.441, 0.102, 1.732]
     
-    default_joint_positions_dict = {
-        'shoulder_pan_joint': 0.00,
-        'shoulder_lift_joint': 5.417,
-        'elbow_joint': 1.341,
-        'wrist_1_joint': -0.441,
-        'wrist_2_joint': 0.102,
-        'wrist_3_joint': 1.732
+    default_joint_positions_dict_1 = {
+        'arm_1_shoulder_pan_joint': 0.00,
+        'arm_1_shoulder_lift_joint': 5.417,
+        'arm_1_elbow_joint': 1.341,
+        'arm_1_wrist_1_joint': -0.441,
+        'arm_1_wrist_2_joint': 0.102,
+        'arm_1_wrist_3_joint': 1.732
+    }
+
+    default_joint_positions_dict_2 = {
+        'arm_2_shoulder_pan_joint': 0.00,
+        'arm_2_shoulder_lift_joint': 5.417,
+        'arm_2_elbow_joint': 1.341,
+        'arm_2_wrist_1_joint': -0.441,
+        'arm_2_wrist_2_joint': 0.102,
+        'arm_2_wrist_3_joint': 1.732
     }
 
     # ==========================================================
@@ -73,7 +82,7 @@ def generate_launch_description():
         parameters=[{
             'use_sim_time': True, 
             'robot_description': robot_description_content_1,
-            'zeros': default_joint_positions_dict
+            'zeros': default_joint_positions_dict_1
         }],
         remappings=[('joint_states', 'joint_states_publisher')]
     )
@@ -90,6 +99,7 @@ def generate_launch_description():
         namespace='arm_1', output='screen',
         parameters=[{
             "use_sim_time": True,
+            "namespace": "arm_1",
             "joint_positions": default_joint_positions_list
         }]
     )
@@ -124,7 +134,7 @@ def generate_launch_description():
         parameters=[{
             'use_sim_time': True, 
             'robot_description': robot_description_content_2,
-            'zeros': default_joint_positions_dict
+            'zeros': default_joint_positions_dict_2
         }],
         remappings=[('joint_states', 'joint_states_publisher')]
     )
@@ -141,6 +151,7 @@ def generate_launch_description():
         namespace='arm_2', output='screen',
         parameters=[{
             "use_sim_time": True,
+            "namespace": "arm_2",
             "joint_positions": default_joint_positions_list
         }]
     )
@@ -155,7 +166,9 @@ def generate_launch_description():
     )
     # 2. Start Arm 1 GUI, Bridge, and Init Angles AFTER Arm 1 trajectory controller is active
     start_post_controllers_1 = RegisterEventHandler(
-        OnProcessExit(target_action=jtc_1, on_exit=[gui_1, bridge_1, set_init_angle_1])
+        OnProcessExit(target_action=jtc_1, on_exit=[
+            # gui_1, bridge_1, 
+            set_init_angle_1])
     )
 
     # 3. CRITICAL: Do NOT even attempt to spawn Arm 2 until Arm 1 is fully spawned!
@@ -169,7 +182,9 @@ def generate_launch_description():
     )
     # 5. Start Arm 2 GUI, Bridge, and Init Angles AFTER Arm 2 trajectory controller is active
     start_post_controllers_2 = RegisterEventHandler(
-        OnProcessExit(target_action=jtc_2, on_exit=[gui_2, bridge_2, set_init_angle_2])
+        OnProcessExit(target_action=jtc_2, on_exit=[
+            # gui_2, bridge_2, 
+            set_init_angle_2])
     )
 
     return LaunchDescription([
@@ -179,8 +194,8 @@ def generate_launch_description():
         rsp_2,             # Publish Arm 2 state
         spawn_1,           # Begin spawning Arm 1
         start_controllers_1,
-        #start_post_controllers_1,
+        start_post_controllers_1,
         start_spawn_2,     # This waits patiently for spawn_1 to finish
         start_controllers_2,
-        #start_post_controllers_2,
+        start_post_controllers_2,
     ])
