@@ -11,11 +11,522 @@
 
     <include>
       <uri>model://table</uri>
+      <name>robot_table</name>
+      <pose>0 0.5 -0.3 0 0 1.5708</pose>
+    </include>
+    <include>
+      <uri>model://table</uri>
       <name>work_table</name>
-      <pose>0 0.5 0 0 0 1.5708</pose>
+      <pose>-0.82 0.5 -0.3 0 0 1.5708</pose>
     </include>
 
+    <include>
+      <uri>model://conveyor_belt</uri>
+      <name>conveyor_belt</name>
+      <pose>-0.8 -0.87 0.0 0 0 0</pose>
+    </include>
     <plugin name="gazebo_link_attacher" filename="libgazebo_link_attacher.so"/>
-    
+    <model name="assembled_obj">
+      <static>true</static>
+      <pose>-0.8 -0.5 0.76 -1.5708 0 1.5708</pose>
+      <link name="base_link">
+        <pose>0 0 0 0 0 0</pose>
+      </link>
+      <link name="back_plate">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate</child>
+      </joint>
+      <link name="back_plate_screw_1">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_1.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_1_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_1</child>
+      </joint>
+      <link name="back_plate_screw_10">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_10.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_10_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_10</child>
+      </joint>
+      <link name="back_plate_screw_11">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_11.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_11_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_11</child>
+      </joint>
+      <link name="back_plate_screw_12">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_12.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_12_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_12</child>
+      </joint>
+      <link name="back_plate_screw_13">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_13.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_13_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_13</child>
+      </joint>
+      <link name="back_plate_screw_14">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_14.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_14_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_14</child>
+      </joint>
+      <link name="back_plate_screw_2">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_2.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_2_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_2</child>
+      </joint>
+      <link name="back_plate_screw_3">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_3.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_3_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_3</child>
+      </joint>
+      <link name="back_plate_screw_4">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_4.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_4_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_4</child>
+      </joint>
+      <link name="back_plate_screw_5">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_5.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_5_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_5</child>
+      </joint>
+      <link name="back_plate_screw_6">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_6.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_6_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_6</child>
+      </joint>
+      <link name="back_plate_screw_7">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_7.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_7_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_7</child>
+      </joint>
+      <link name="back_plate_screw_8">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_8.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_8_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_8</child>
+      </joint>
+      <link name="back_plate_screw_9">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/back_plate_screw_9.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="back_plate_screw_9_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>back_plate_screw_9</child>
+      </joint>
+      <link name="battery_1">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/battery_1.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="battery_1_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>battery_1</child>
+      </joint>
+      <link name="battery_2">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/battery_2.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="battery_2_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>battery_2</child>
+      </joint>
+      <link name="copper_plate_1">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/copper_plate_1.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="copper_plate_1_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>copper_plate_1</child>
+      </joint>
+      <link name="copper_plate_2">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/copper_plate_2.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="copper_plate_2_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>copper_plate_2</child>
+      </joint>
+      <link name="copper_plate_3">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/copper_plate_3.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="copper_plate_3_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>copper_plate_3</child>
+      </joint>
+      <link name="copper_plate_screw_1">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/copper_plate_screw_1.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="copper_plate_screw_1_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>copper_plate_screw_1</child>
+      </joint>
+      <link name="copper_plate_screw_2">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/copper_plate_screw_2.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="copper_plate_screw_2_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>copper_plate_screw_2</child>
+      </joint>
+      <link name="copper_plate_screw_3">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/copper_plate_screw_3.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="copper_plate_screw_3_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>copper_plate_screw_3</child>
+      </joint>
+      <link name="copper_plate_screw_4">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/copper_plate_screw_4.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="copper_plate_screw_4_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>copper_plate_screw_4</child>
+      </joint>
+      <link name="copper_plate_screw_5">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/copper_plate_screw_5.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="copper_plate_screw_5_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>copper_plate_screw_5</child>
+      </joint>
+      <link name="cpu">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/cpu.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="cpu_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>cpu</child>
+      </joint>
+      <link name="fan_1">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/fan_1.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="fan_1_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>fan_1</child>
+      </joint>
+      <link name="fan_2">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/fan_2.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="fan_2_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>fan_2</child>
+      </joint>
+      <link name="model">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/model.dae</uri>
+              <scale>0.001 0.001 0.001</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="model_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>model</child>
+      </joint>
+      <link name="motherboard">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/motherboard.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="motherboard_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>motherboard</child>
+      </joint>
+      <link name="ram_1">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/ram_1.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="ram_1_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>ram_1</child>
+      </joint>
+      <link name="ram_2">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/ram_2.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="ram_2_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>ram_2</child>
+      </joint>
+      <link name="ssd">
+        <pose>0 0 0 0 0 0</pose>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/abhinand/AutoMan_ws/src/dual_ur5/models/laptop/dae_parts/ssd.dae</uri>
+              <scale>0.1 0.1 0.1</scale>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <joint name="ssd_joint" type="fixed">
+        <parent>base_link</parent>
+        <child>ssd</child>
+      </joint>
+    </model>
   </world>
 </sdf>

@@ -11,6 +11,8 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     share_dir = get_package_share_directory('dual_ur5')
     gazebo_pkg = get_package_share_directory('gazebo_ros')
+    conveyor_pkg = get_package_share_directory('conveyorbelt_gazebo')
+    
     workspace_share_dir = os.path.dirname(share_dir)
     
     set_gazebo_model_path = AppendEnvironmentVariable(
@@ -27,6 +29,23 @@ def generate_launch_description():
         launch_arguments={
             'world': world_path
         }.items()
+    )
+
+    # ==========================================================
+    # SCENE OBJECTS (WORK TABLE & CONVEYOR BELT)
+    # ==========================================================
+    table_sdf = os.path.join(share_dir, 'models', 'table', 'model.sdf')
+
+    laptop_sdf = os.path.join(share_dir, 'models', 'laptop', 'model.sdf')
+    spawn_laptop = Node(
+        package='gazebo_ros', executable='spawn_entity.py',
+        name='spawn_laptop', output='screen',
+        arguments=[
+            '-entity', 'laptop', 
+            '-file', laptop_sdf, 
+            '-x', '0.5', '-y', '-1.05', '-z', '0.31', # Elevated to drop onto table
+            '-Y', '0.0'
+        ]
     )
 
     # ==========================================================
@@ -66,7 +85,7 @@ def generate_launch_description():
     spawn_1 = Node(
         package='gazebo_ros', executable='spawn_entity.py',
         namespace='arm_1', output='screen',
-        arguments=['-entity', 'arm_1', '-topic', 'robot_description', '-robot_namespace', 'arm_1', '-x', '0.0', '-y', '0.0', '-z', '1.02']
+        arguments=['-entity', 'arm_1', '-topic', 'robot_description', '-robot_namespace', 'arm_1', '-x', '-0.2', '-y', '0.2', '-z', '0.72']
     )
     jsb_1 = Node(
         package="controller_manager", executable="spawner",
@@ -118,7 +137,7 @@ def generate_launch_description():
     spawn_2 = Node(
         package='gazebo_ros', executable='spawn_entity.py',
         namespace='arm_2', output='screen',
-        arguments=['-entity', 'arm_2', '-topic', 'robot_description', '-robot_namespace', 'arm_2', '-x', '0.0', '-y', '0.6', '-z', '1.02']
+        arguments=['-entity', 'arm_2', '-topic', 'robot_description', '-robot_namespace', 'arm_2', '-x', '-0.2', '-y', '1.0', '-z', '0.72']
     )
     jsb_2 = Node(
         package="controller_manager", executable="spawner",
@@ -190,6 +209,7 @@ def generate_launch_description():
     return LaunchDescription([
         set_gazebo_model_path,
         gazebo,
+        #spawn_laptop,    # Spawns the laptop
         rsp_1,             # Publish Arm 1 state
         rsp_2,             # Publish Arm 2 state
         spawn_1,           # Begin spawning Arm 1
