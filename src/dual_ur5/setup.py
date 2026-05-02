@@ -50,6 +50,8 @@ setup(
             'gui_bridge = dual_ur5.gui_bridge:main',
             'set_joint_angles = dual_ur5.set_joint_angles:main',
             'inv_kin = dual_ur5.inv_kin:main',
+            'task_planner = dual_ur5.task_planner:main',
+            'for_kin_task_planner = dual_ur5.for_kin_task_planner:main',
         ],
     },
 )

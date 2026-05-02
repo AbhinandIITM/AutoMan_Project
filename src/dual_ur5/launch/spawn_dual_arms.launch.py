@@ -74,7 +74,7 @@ def generate_launch_description():
     spawn_1 = Node(
         package='gazebo_ros', executable='spawn_entity.py',
         namespace='arm_1', output='screen',
-        arguments=['-entity', 'arm_1', '-topic', 'robot_description', '-robot_namespace', 'arm_1', '-x', '-0.2', '-y', '0.2', '-z', '0.72']
+        arguments=['-entity', 'arm_1', '-topic', 'robot_description', '-robot_namespace', 'arm_1', '-x', '-0.2', '-y', '0.0', '-z', '0.72']
     )
     jsb_1 = Node(
         package="controller_manager", executable="spawner",
@@ -111,6 +111,11 @@ def generate_launch_description():
             "namespace": "arm_1",
             "joint_positions": default_joint_positions_list
         }]
+    )
+    inv_kin_1 = Node(
+        package='dual_ur5', executable='inv_kin',
+        namespace='arm_1', output='screen',
+        parameters=[{'namespace': 'arm_1'}]
     )
 
     # ==========================================================
@@ -165,6 +170,11 @@ def generate_launch_description():
             "joint_positions": default_joint_positions_list
         }]
     )
+    inv_kin_2 = Node(
+        package='dual_ur5', executable='inv_kin',
+        namespace='arm_2', output='screen',
+        parameters=[{'namespace': 'arm_2'}]
+    )
 
     # ==========================================================
     # EVENT HANDLERS: THE SEQUENCING LOGIC
@@ -177,8 +187,8 @@ def generate_launch_description():
     # 2. Start Arm 1 GUI, Bridge, and Init Angles AFTER Arm 1 trajectory controller is active
     start_post_controllers_1 = RegisterEventHandler(
         OnProcessExit(target_action=jtc_1, on_exit=[
-            gui_1, bridge_1, 
-            set_init_angle_1])
+            #gui_1, bridge_1, 
+            set_init_angle_1, inv_kin_1])
     )
 
     # 3. CRITICAL: Do NOT even attempt to spawn Arm 2 until Arm 1 is fully spawned!
@@ -194,17 +204,24 @@ def generate_launch_description():
     start_post_controllers_2 = RegisterEventHandler(
         OnProcessExit(target_action=jtc_2, on_exit=[
             gui_2, bridge_2, 
-            set_init_angle_2])
+            set_init_angle_2, inv_kin_2])
     )
     start_conveyor = TimerAction(
-        period=26.0, 
+        period=35.0, 
         actions=[
             ExecuteProcess(
-                cmd=['ros2', 'service', 'call', '/CONVEYORPOWER', 'conveyorbelt_msgs/srv/ConveyorBeltControl', '"{power: 100.0}"'],
+                cmd=['ros2', 'service', 'call', '/CONVEYORPOWER', 'conveyorbelt_msgs/srv/ConveyorBeltControl', '"{power: 10.0}"'],
                 shell=True,
                 output='screen'
             )
         ]
+    )
+    task_planner = Node(
+        package='dual_ur5', executable='for_kin_task_planner',
+        output='screen'
+    )
+    start_task_planner = RegisterEventHandler(
+        OnProcessExit(target_action=set_init_angle_2, on_exit=[task_planner])
     )
     return LaunchDescription([
         set_gazebo_model_path,
@@ -217,5 +234,6 @@ def generate_launch_description():
         start_spawn_2,     # This waits patiently for spawn_1 to finish
         start_controllers_2,
         start_post_controllers_2,
-        start_conveyor,
+        #start_conveyor,
+        #start_task_planner,
     ])

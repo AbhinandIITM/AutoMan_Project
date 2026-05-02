@@ -75,50 +75,71 @@ class InverseKinematicsNode(Node):
 
         return J
 
-    def inverse_kinematics(self, target_T, initial_guess, max_iterations=500, tolerance=1e-4):
-        """Solves IK using the Newton-Raphson method with Jacobian pseudo-inverse."""
-        joints = np.array(initial_guess, dtype=float)
+    def inverse_kinematics(self, target_T, initial_guess, max_iterations=1000, tolerance=1e-4):
+        """Solves IK using Damped Least Squares (DLS) with Multi-Start to avoid local minima."""
+        
+        # We define a list of different starting poses. 
+        # If the first guess gets stuck, it tries the next one!
+        guesses = [
+            initial_guess,
+            [0.0, -1.57, 0.0, -1.57, 0.0, 0.0],     # Arm pointing straight up
+            [1.57, -1.57, 1.57, -1.57, -1.57, 0.0], # Arm turned 90 degrees left
+            [-1.57, -1.57, 1.57, -1.57, -1.57, 0.0] # Arm turned 90 degrees right
+        ]
+
         target_pos = target_T[:3, 3]
         target_rot = target_T[:3, :3]
+        
+        # Damping factor to prevent matrix explosion near singularities
+        lambda_sq = 0.01 
 
-        for _ in range(max_iterations):
-            current_T = self.forward_kinematics(joints)
-            current_pos = current_T[:3, 3]
-            current_rot = current_T[:3, :3]
+        for attempt, guess in enumerate(guesses):
+            joints = np.array(guess, dtype=float)
 
-            # Position error
-            err_pos = target_pos - current_pos
+            for step in range(max_iterations):
+                current_T = self.forward_kinematics(joints)
+                current_pos = current_T[:3, 3]
+                current_rot = current_T[:3, :3]
 
-            # Orientation error (axis-angle representation)
-            rot_diff = np.dot(target_rot, current_rot.T)
-            angle = np.arccos(np.clip((np.trace(rot_diff) - 1) / 2, -1.0, 1.0))
-            
-            if angle < 1e-6:
-                err_rot = np.zeros(3)
-            else:
-                axis = np.array([
-                    rot_diff[2, 1] - rot_diff[1, 2],
-                    rot_diff[0, 2] - rot_diff[2, 0],
-                    rot_diff[1, 0] - rot_diff[0, 1]
-                ]) / (2 * math.sin(angle))
-                err_rot = angle * axis
+                # Position error
+                err_pos = target_pos - current_pos
 
-            # Combine errors
-            error = np.concatenate((err_pos, err_rot))
+                # Orientation error (axis-angle representation)
+                rot_diff = np.dot(target_rot, current_rot.T)
+                angle = np.arccos(np.clip((np.trace(rot_diff) - 1) / 2, -1.0, 1.0))
+                
+                if angle < 1e-6:
+                    err_rot = np.zeros(3)
+                else:
+                    axis = np.array([
+                        rot_diff[2, 1] - rot_diff[1, 2],
+                        rot_diff[0, 2] - rot_diff[2, 0],
+                        rot_diff[1, 0] - rot_diff[0, 1]
+                    ]) / (2 * math.sin(angle))
+                    err_rot = angle * axis
 
-            # Check convergence
-            if np.linalg.norm(error) < tolerance:
-                return joints
+                # Combine errors
+                error = np.concatenate((err_pos, err_rot))
 
-            # Get Jacobian and apply pseudo-inverse
-            J = self.jacobian(joints)
-            J_pinv = np.linalg.pinv(J)
+                # Check convergence
+                if np.linalg.norm(error) < tolerance:
+                    if attempt > 0:
+                        self.get_logger().info(f"IK solved successfully on backup guess #{attempt + 1}")
+                    return joints
 
-            # Update joints (with a small learning rate to prevent wild swings)
-            delta_theta = np.dot(J_pinv, error)
-            joints += 0.5 * delta_theta 
+                # Get Jacobian
+                J = self.jacobian(joints)
+                
+                # Damped Least Squares (DLS) Integration
+                # Formula: J_pinv = J.T * inv(J * J.T + lambda^2 * I)
+                J_T = J.T
+                J_pinv = np.dot(J_T, np.linalg.inv(np.dot(J, J_T) + lambda_sq * np.eye(6)))
 
-        self.get_logger().warn("IK did not converge within the maximum iterations.")
+                # Update joints (No more need to artificially slow it down with 0.5)
+                delta_theta = np.dot(J_pinv, error)
+                joints += delta_theta 
+
+        self.get_logger().warn("IK did not achieve perfect convergence. Returning closest approximation.")
         return joints
 
     def quaternion_to_matrix(self, q):

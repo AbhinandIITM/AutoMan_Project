@@ -54,3 +54,6 @@ install/
 log/
 build/
 frames_*
+*.png
+*.mp4
+*.webm
